@@ -1,0 +1,27 @@
+name: Build ChatGPT Bot on VPS
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - name: Run a build command
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: main.yml
+          directory: ${{secrets.LOCAL_APP_PATH}}/.ansible
+          key: ${{secrets.SSH_PRIVATE_KEY}}
+          inventory: ${{secrets.INVENTORY}}
+          options: |
+            -e RELEASE=${{github.ref_name}}
+            -e NODE_ENV=production
+            -e VPS_USER=${{secrets.VPS_USER}}
+            -e VPS_APP_PATH=${{secrets.VPS_APP_PATH}}
+            -e GITHUB_REPO=${{github.repository}}
+            -e TELEGRAM_BOT_TOKEN=${{secrets.TELEGRAM_BOT_TOKEN}}
+            -e OPENAI_API_KEY=${{secrets.OPENAI_API_KEY}}
+            -e ALLOWED_USERS=${{secrets.ALLOWED_USERS}}

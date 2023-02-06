@@ -1,11 +1,29 @@
 {
-  "name": "chatgpt",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC"
+    "name": "chatgpt",
+    "version": "1.0.0",
+    "description": "Telegram bot based on ChatGPT for personal usage",
+    "author": "inevix",
+    "license": "MIT",
+    "main": "index.js",
+    "scripts": {
+        "start": "node bot/index.js",
+        "docker:start": "NODE_ENV=production docker compose -f .docker/docker-compose.yml up --force-recreate --build -d",
+        "docker:stop": "NODE_ENV=production docker compose -f .docker/docker-compose.yml down",
+        "docker:restart": "npm run docker:stop && npm run docker:start",
+        "dev": "nodemon bot/index.js",
+        "docker:dev": "NODE_ENV=dev docker compose -f .docker/docker-compose.yml up --force-recreate --build"
+    },
+    "dependencies": {
+        "@puregram/session": "^2.0.1-rc.1",
+        "dotenv": "^16.0.3",
+        "openai": "^3.1.0",
+        "telegraf": "^4.11.2"
+    },
+    "devDependencies": {
+        "prettier": "^2.8.3",
+        "eslint": "^8.33.0",
+        "eslint-config-prettier": "^8.6.0",
+        "eslint-plugin-prettier": "^4.2.1",
+        "nodemon": "^2.0.20"
+    }
 }

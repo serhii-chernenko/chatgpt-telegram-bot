@@ -1,0 +1,22 @@
+- name: Build ChatGPT Bot image on VPS
+  docker_image:
+    name: chatgpt_bot_image
+    state: present
+    force_source: yes
+    source: build
+    build:
+      path: "{{VPS_APP_PATH}}"
+      dockerfile: "./.docker/{{NODE_ENV}}.dockerfile"
+
+- name: Restart ChatGPT Bot container on VPS
+  docker_container:
+    name: chatgpt_bot
+    image: chatgpt_bot_image
+    restart: yes
+    recreate: yes
+    network_mode: "host"
+    env:
+      NODE_ENV: "{{NODE_ENV}}"
+      TELEGRAM_BOT_TOKEN: "{{TELEGRAM_BOT_TOKEN}}"
+      OPENAI_API_KEY: "{{OPENAI_API_KEY}}"
+      ALLOWED_USERS: "{{ALLOWED_USERS}}"

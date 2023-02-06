@@ -1,0 +1,6 @@
+- name: Update Wishlist Bot on VPS
+  hosts: all
+  remote_user: "{{ VPS_USER }}"
+  roles:
+    - git_pull
+    - docker_restart

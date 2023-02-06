@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+    app:
+        image: chatgpt_bot_${NODE_ENV}
+        container_name: chatgpt_bot_${NODE_ENV}
+        build:
+            context: ../
+            dockerfile: ./.docker/${NODE_ENV}.dockerfile
+        volumes:
+            - ../bot:/chatgpt/bot
+        env_file: ../env/.env
+        environment:
+            - NODE_ENV=${NODE_ENV}

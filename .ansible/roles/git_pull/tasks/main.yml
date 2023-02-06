@@ -1,0 +1,6 @@
+- name: Update ChatGPT Bot repo on VPS
+  git:
+    repo: "git@github.com:{{GITHUB_REPO}}.git"
+    dest: "{{VPS_APP_PATH}}"
+    update: yes
+    version: "{{RELEASE}}"
