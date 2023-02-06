@@ -24,4 +24,4 @@ jobs:
             -e GITHUB_REPO=${{github.repository}}
             -e TELEGRAM_BOT_TOKEN=${{secrets.TELEGRAM_BOT_TOKEN}}
             -e OPENAI_API_KEY=${{secrets.OPENAI_API_KEY}}
-            -e ALLOWED_USERS=${{secrets.ALLOWED_USERS}}
+            -e ALLOWED_USERS="${{secrets.ALLOWED_USERS}}"
