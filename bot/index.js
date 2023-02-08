@@ -5,7 +5,7 @@ const { join } = require('path');
 const { Configuration, OpenAIApi } = require('openai');
 
 require('dotenv').config({
-    path: join(__dirname, '..', 'env', '.env')
+    path: join(__dirname, '..', 'env', `.env.${process.env.NODE_ENV}`)
 });
 
 const configuration = new Configuration({
@@ -38,9 +38,7 @@ if (process.env.NODE_ENV === 'dev') {
     bot.use(Telegraf.log());
 }
 
-const sessionManager = new SessionManager();
-
-bot.use(sessionManager.middleware);
+bot.use(new SessionManager().middleware);
 bot.use(createDialogs);
 bot.use(checkAccess);
 
@@ -50,6 +48,10 @@ bot.start(async ctx => {
     await ctx.sendMessage('Hello there!');
 });
 
+bot.help(async ctx => {
+    await ctx.sendMessage('/reset - Reset dialog context');
+});
+
 bot.command('reset', async ctx => {
     ctx.session.dialogs.set(ctx.chat.id, []);
 
@@ -57,41 +59,45 @@ bot.command('reset', async ctx => {
 });
 
 bot.on(message('text'), async ctx => {
-    let typing = setInterval(async () => {
+    const chatId = ctx.chat.id;
+    const isTest = ctx.message.text.length < 5;
+    const testPromt = 'Say this is a test';
+
+    const typing = setInterval(async () => {
         await ctx.sendChatAction('typing');
     }, 1000);
 
+    if (!ctx.session.dialogs.has(chatId)) {
+        ctx.session.dialogs.set(chatId, []);
+    }
+
+    const dialog = ctx.session.dialogs.get(chatId);
+
+    if (!isTest) {
+        dialog.push(ctx.message.text);
+    }
+
     try {
-        const chatId = ctx.chat.id;
-        const isTest = ctx.message.text.length < 5;
-
-        if (!ctx.session.dialogs.has(chatId)) {
-            ctx.session.dialogs.set(chatId, []);
-        }
-
-        const dialog = ctx.session.dialogs.get(chatId);
-
-        if (!isTest) {
-            dialog.push(ctx.message.text);
-        }
-
         const response = await openai.createCompletion({
-            // model: 'text-davinci-003',
-            model: 'ada',
-            prompt: isTest ? 'Say this is a test' : dialog.join('\n'),
-            max_tokens: 2048
+            model: 'text-davinci-003',
+            prompt: isTest ? testPromt : dialog.join('\n'),
+            temperature: 0.5,
+            max_tokens: isTest
+                ? 4000 - testPromt.length
+                : 4000 - ctx.message.text.length
         });
         const answer = response.data.choices[0].text;
 
         clearInterval(typing);
-        await ctx.replyWithMarkdown(response.data.choices[0].text);
+        await ctx.sendMessage(response.data.choices[0].text);
 
         ctx.session.dialogs.delete(chatId);
         ctx.session.dialogs.set(chatId, dialog);
     } catch (error) {
         clearInterval(typing);
+
         await ctx.sendMessage(
-            error.response ? error.response.statusText : error.message
+            error?.response?.statusText ?? error.response.description
         );
     }
 });

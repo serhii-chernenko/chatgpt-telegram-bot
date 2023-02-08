@@ -6,11 +6,11 @@
     "license": "MIT",
     "main": "index.js",
     "scripts": {
-        "start": "node bot/index.js",
+        "start": "NODE_ENV=production node bot/index.js",
         "docker:start": "NODE_ENV=production docker compose -f .docker/docker-compose.yml up --force-recreate --build -d",
         "docker:stop": "NODE_ENV=production docker compose -f .docker/docker-compose.yml down",
         "docker:restart": "npm run docker:stop && npm run docker:start",
-        "dev": "nodemon bot/index.js",
+        "dev": "NODE_ENV=dev nodemon bot/index.js",
         "docker:dev": "NODE_ENV=dev docker compose -f .docker/docker-compose.yml up --force-recreate --build"
     },
     "dependencies": {
