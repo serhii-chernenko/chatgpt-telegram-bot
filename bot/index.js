@@ -76,7 +76,8 @@ bot.on(message('text'), async ctx => {
         }
 
         const response = await openai.createCompletion({
-            model: 'text-davinci-003',
+            // model: 'text-davinci-003',
+            model: 'ada',
             prompt: isTest ? 'Say this is a test' : dialog.join('\n'),
             max_tokens: 2048
         });
