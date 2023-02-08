@@ -124,6 +124,13 @@ ALLOWED_USERS="username"
 ALLOWED_USERS="username1 username2 username3..."
 ```
 
+Before you'll add a lot of users, remember that you have only $18 for the trial period ~3 months.<br/>
+Перед тим, як давати доступ великій кількості людей, памʼятай, що безкоштовно ти можеш використовувати чат тільки 3 місяці і маєш на це $18.<br/>
+
+Check usage:<br/>
+Перевірити використання:<br/>
+https://platform.openai.com/account/usage
+
 ### Run docker containers in the developer mode<br/>Запусти докер контейнери в режимі розробника
 
 ```shell
