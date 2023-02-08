@@ -9,6 +9,6 @@ services:
             dockerfile: ./.docker/${NODE_ENV}.dockerfile
         volumes:
             - ../bot:/chatgpt/bot
-        env_file: ../env/.env
+        env_file: ../env/.env.${NODE_ENV}
         environment:
             - NODE_ENV=${NODE_ENV}
