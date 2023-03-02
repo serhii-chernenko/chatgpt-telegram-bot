@@ -4,7 +4,8 @@
             "OpenAI package updated. The model gpt-3.5-turbo is available!"
         ],
         "updated": [
-            "Context saving of conversations is working better by removing old messages. That allows to have an infinite conversation without the context resetting."
+            "Context saving of conversations is working better by removing old messages. That allows to have an infinite conversation without the context resetting.",
+            "Telegram response changed from simple text to text with Markdown V1 to highlight a code syntax."
         ],
         "fixed": [
             "Response max token decreased from 4000 to 1000.",
