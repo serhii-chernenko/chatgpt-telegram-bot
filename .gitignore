@@ -1,5 +1,6 @@
 *
 !.gitignore
+!changelog.json
 !/.github
 !/.github/workflows
 !/.github/workflows/main.yml

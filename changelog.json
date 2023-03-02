@@ -1,0 +1,18 @@
+{
+    "1.1.0": {
+        "upgraded": [
+            "OpenAI package updated. The model gpt-3.5-turbo is available!"
+        ],
+        "updated": [
+            "Context saving of conversations is working better by removing old messages. That allows to have an infinite conversation without the context resetting."
+        ],
+        "fixed": [
+            "Response max token decreased from 4000 to 1000.",
+            "Temperature increased from 0.5 to 1 (by default)."
+        ],
+        "notes": [
+            "Updating to 3.5 allows to decrease the cost from $0.020/1k tokens to $0.002/1k tokens. The language model is working in the same way."
+        ]
+    },
+    "1.0.0": "The first version is implemented."
+}
