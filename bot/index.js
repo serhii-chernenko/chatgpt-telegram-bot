@@ -13,6 +13,9 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
+const MAX_CONTEXT_TOKENS = 4096;
+const MAX_RESPONSE_TOKENS = 1000;
+
 const createDialogs = (ctx, next) => {
     if (!ctx?.session?.dialogs) {
         ctx.session.dialogs = new Map();
@@ -61,7 +64,6 @@ bot.command('reset', async ctx => {
 bot.on(message('text'), async ctx => {
     const chatId = ctx.chat.id;
     const isTest = ctx.message.text.length < 5;
-    const testPromt = 'Say this is a test';
 
     const typing = setInterval(async () => {
         await ctx.sendChatAction('typing');
@@ -71,30 +73,56 @@ bot.on(message('text'), async ctx => {
         ctx.session.dialogs.set(chatId, []);
     }
 
-    const dialog = ctx.session.dialogs.get(chatId);
+    let dialog = ctx.session.dialogs.get(chatId);
 
     if (!isTest) {
-        dialog.push(ctx.message.text);
+        dialog.push({
+            role: 'user',
+            content: ctx.message.text
+        });
     }
 
+    const slicedContext = dialog => {
+        const contextLength = dialog.reduce(
+            (acc, { content }) => acc + content.length,
+            0
+        );
+
+        if (contextLength <= MAX_CONTEXT_TOKENS - MAX_RESPONSE_TOKENS) {
+            return dialog;
+        }
+
+        dialog.shift();
+
+        return slicedContext(dialog);
+    };
+
+    dialog = slicedContext(dialog);
+
     try {
-        const response = await openai.createCompletion({
-            model: 'text-davinci-003',
-            prompt: isTest ? testPromt : dialog.join('\n'),
-            temperature: 0.5,
-            max_tokens: isTest
-                ? 4000 - testPromt.length
-                : 4000 - ctx.message.text.length
+        const response = await openai.createChatCompletion({
+            model: 'gpt-3.5-turbo',
+            messages: dialog,
+            max_tokens: MAX_RESPONSE_TOKENS
         });
-        const answer = response.data.choices[0].text;
+        const { message } = response.data.choices[0];
+        const { content } = message;
+
+        dialog.push(message);
 
         clearInterval(typing);
-        await ctx.sendMessage(response.data.choices[0].text);
+        await ctx.replyWithMarkdown(content);
 
         ctx.session.dialogs.delete(chatId);
         ctx.session.dialogs.set(chatId, dialog);
     } catch (error) {
         clearInterval(typing);
+
+        const openAIError = error.response?.data?.error?.message;
+
+        if (openAIError) {
+            return await ctx.sendMessage(openAIError);
+        }
 
         await ctx.sendMessage(
             error?.response?.statusText ?? error.response.description
